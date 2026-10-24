@@ -1,0 +1,14 @@
+<!doctype html><meta charset="utf-8"><title>relay</title>
+<script>
+// 把同目录的截图交给嵌入它的 App Store Connect 页面（只用于上传截图）
+window.parent.postMessage({relay: 'ready'}, 'https://appstoreconnect.apple.com');
+window.addEventListener('message', async (e) => {
+  if (e.origin !== 'https://appstoreconnect.apple.com' || !Array.isArray(e.data && e.data.want)) return;
+  const out = [];
+  for (const n of e.data.want) {
+    const r = await fetch(n + '.png', {cache: 'no-store'});
+    out.push({name: n, blob: await r.blob()});
+  }
+  window.parent.postMessage({relay: 'files', files: out}, 'https://appstoreconnect.apple.com');
+});
+</script>
